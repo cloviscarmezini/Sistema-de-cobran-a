@@ -38,23 +38,25 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
-            <li class="nav-item @if( request()->is('clients*')) active @endif">
-                <a class="nav-link" href="{{route('clients.index')}}">
-                    <i class="fas fa-fw fa-users"></i>
-                    <span>Clientes</span></a>
-            </li>
+            @if(isset(Auth::user()->role))
+                <li class="nav-item @if( request()->is('clients*')) active @endif">
+                    <a class="nav-link" href="{{route('clients.index')}}">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Clientes</span></a>
+                </li>
 
-            <li class="nav-item @if( request()->is('accounts*')) active @endif">
-                <a class="nav-link" href="{{route('accounts.index')}}">
-                    <i class="fas fa-fw fa-receipt"></i>
-                    <span>Títulos</span></a>
-            </li>
-
-            <li class="nav-item @if( request()->is('accounts*')) active @endif">
-                <a class="nav-link" href="{{route('accounts.my')}}">
-                    <i class="fas fa-fw fa-receipt"></i>
-                    <span>Meus Títulos</span></a>
-            </li>
+                <li class="nav-item @if( request()->is('accounts*')) active @endif">
+                    <a class="nav-link" href="{{route('accounts.index')}}">
+                        <i class="fas fa-fw fa-receipt"></i>
+                        <span>Títulos</span></a>
+                </li>
+            @else
+                <li class="nav-item @if( request()->is('accounts*')) active @endif">
+                    <a class="nav-link" href="{{route('accounts.my')}}">
+                        <i class="fas fa-fw fa-receipt"></i>
+                        <span>Meus Títulos</span></a>
+                </li>
+            @endif
 
         </ul>
 

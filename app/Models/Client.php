@@ -39,4 +39,8 @@ class Client extends Authenticatable
       return $this->password;
     }
 
+    public function accounts()
+    {
+        return $this->belongsTo(Account::class, 'client_id');
+    }
 }

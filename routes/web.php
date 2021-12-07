@@ -21,10 +21,19 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['middleware' => ['auth']], function(){
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/client-login', [App\Http\Controllers\Auth\ClientLoginController::class, 'index'])->name('client.login');
+Route::post('/clientLogin', [App\Http\Controllers\Auth\ClientLoginController::class, 'login'])->name('client.handle.login');
+
+Route::group(['middleware' => ['assign.guard:user']], function() {
     Route::resource('clients', ClientController::class);
     Route::resource('accounts', AccountController::class)->except('show');
+});
+
+Route::group(['middleware' => ['assign.guard:client']], function() {
     Route::get('accounts/my', [AccountController::class, 'my'])->name('accounts.my');
+});
+
+Route::group(['middleware' => ['assign.guard:client', 'assign.guard:user']], function() {
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });
 
