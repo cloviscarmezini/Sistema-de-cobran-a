@@ -10,7 +10,7 @@
                     <div class="form-group mt-4">
                         <input type="file" name="file" class="form-control" accept=".csv">
                     </div>
-                    <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Importar</button>
+                    <button class="btn btn-primary mt-4" type="submit">Importar</button>
                 </form>
             </div>
         </div>

@@ -57,6 +57,8 @@ class ClientLoginController extends Controller
             'password' => Hash::make($password)
         ]);
 
+        $client->save();
+
         flash('Senha cadastrada com sucesso')->success();
         return redirect()->route('client.login');
     }
