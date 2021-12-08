@@ -45,10 +45,15 @@
                         <span>Clientes</span></a>
                 </li>
 
-                <li class="nav-item @if( request()->is('accounts*')) active @endif">
+                <li class="nav-item @if( request()->is('accounts*') && !request()->is('accounts/import'))) active @endif">
                     <a class="nav-link" href="{{route('accounts.index')}}">
                         <i class="fas fa-fw fa-receipt"></i>
                         <span>Títulos</span></a>
+                </li>
+                <li class="nav-item @if( request()->is('accounts/import')) active @endif">
+                    <a class="nav-link" href="{{route('accounts.import')}}">
+                        <i class="fas fa-fw fa-receipt"></i>
+                        <span>Importar Títulos</span></a>
                 </li>
             @else
                 <li class="nav-item @if( request()->is('accounts*')) active @endif">

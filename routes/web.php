@@ -30,6 +30,8 @@ Route::group(['middleware' => ['assign.guard:user']], function() {
     Route::resource('clients', ClientController::class);
     Route::resource('accounts', AccountController::class)->except('show');
     Route::get('accounts/view/{account}', [AccountController::class, 'view'])->name('accounts.view');
+    Route::get('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
+    Route::post('accounts/import-upload', [AccountController::class, 'import_upload'])->name('accounts.import.upload');
 });
 
 Route::group(['middleware' => ['assign.guard:client']], function() {

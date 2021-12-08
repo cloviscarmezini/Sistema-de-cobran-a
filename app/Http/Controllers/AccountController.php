@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -261,4 +262,86 @@ class AccountController extends Controller
 
         return redirect()->route('accounts.installments', ['account_id' => $installment->account_id]);
     }
+
+    //import Accounts 
+    public function import()
+    {
+        return view('accounts.import');
+    }
+
+    public function import_upload(Request $request)
+    {
+        $user = auth()->user();
+        
+        $fileName = $request->file->getClientOriginalName();
+
+        //Where uploaded file will be stored on the server 
+        $location = 'uploads'; //Created an "uploads" folder for that
+
+        try {
+            // Upload file
+            $request->file->move($location, $fileName);
+        
+            // In case the uploaded file path is to be stored in the database 
+            $filepath = public_path($location . "/" . $fileName);
+
+            // Reading file
+            $file = fopen($filepath, "r");
+            $import_data_arr = []; // Read through the file and store the contents as an array
+            $i = 0;
+            //Read the contents of the uploaded file 
+            while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+                $num = count($filedata);
+                for ($c = 0; $c < $num; $c++) {
+                    $import_data_arr[$i][] = $filedata[$c];
+                }
+                $i++;
+            }
+            fclose($file); //Close after reading$j = 0;
+
+            foreach ($import_data_arr as $importData) {
+                $client_email  = $importData[0];         //Document
+                $description = $importData[1];       //Descricao
+                $type  = $importData[2];             //Tipo
+                $readjustment_type = $importData[3]; //Rejuste
+                $value = $importData[4];             //valor
+                $discount= $importData[5];           //disconto
+                $installments= $importData[6];       //parcela
+                $expiration_date  = $importData[7];  //data           
+                
+                    
+                $client = $this->client->where('email',$client_email)->first();
+                
+                if(!$client) { 
+                  abort(403, "Cliente não encontrado!");
+                }
+            
+                $expiration_date = \Carbon\Carbon::createFromFormat("d/m/Y", trim($expiration_date));
+                $expiration_date = $expiration_date->format('Y-m-d'); 
+                
+                $data['user_id'] = $user->id;
+                $data['client_id'] = $client->id;
+                $data['description'] = $description;
+                $data['type'] = $type; 
+                $data['readjustment_type'] = $readjustment_type;
+                $data['value'] = $value;
+                $data['discount'] = $discount;
+                $data['installments'] = $installments;
+                $data['expiration_date'] = $expiration_date;    
+        
+                $account = $this->account->create($data);
+        
+                if(env('APP_ENV') === 'production') {
+                    Mail::to($account->client->email)->send(new NewAccountMail($account));
+                }
+            } 
+            flash('Título importado com sucesso')->success();
+        } catch (\Exception $e) {
+            flash($e->getMessage())->error();
+        }
+            
+        return redirect()->route('accounts.index');
+
+    }
+
 }

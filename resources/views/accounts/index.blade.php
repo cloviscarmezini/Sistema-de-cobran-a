@@ -5,7 +5,7 @@
         <div class="my-3 text-right">
             <a href="{{route('accounts.create')}}" class="btn btn-primary">Novo título</a>
         </div>
-
+        
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
