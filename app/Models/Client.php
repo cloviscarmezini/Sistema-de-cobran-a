@@ -41,6 +41,6 @@ class Client extends Authenticatable
 
     public function accounts()
     {
-        return $this->belongsTo(Account::class, 'client_id');
+        return $this->hasMany(Account::class, 'client_id');
     }
 }

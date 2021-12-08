@@ -33,6 +33,8 @@ class AccountController extends Controller
             $accounts = $this->account->paginate(10);
         }
 
+        $accounts = $this->getAccountsStatus($accounts);
+
         return view('accounts.index', compact('accounts'));
     }
 
@@ -125,8 +127,138 @@ class AccountController extends Controller
     {
         $client = auth()->user();
 
-        $accounts = $client->accounts()->with('client')->paginate(10);
+        $accounts = $client
+        ->accounts()
+        ->with('tradeInstallments')
+        ->paginate(10);
+
+        $accounts = $this->getAccountsStatus($accounts);
 
         return view('accounts.my', compact('accounts'));
+    }
+
+    public function trade($account_id)
+    {
+        $client = auth()->user();
+
+        $account = $client
+        ->accounts()
+        ->where('id', $account_id)
+        ->with('tradeInstallments')
+        ->first();
+
+        return view('accounts.trade', compact('account'));
+    }
+
+    public function installments($account_id)
+    {
+        $client = auth()->user();
+
+        $account = $client
+        ->accounts()
+        ->where('id', $account_id)
+        ->with(['tradeInstallments' => function($query) {
+            $query->orderBy('expiration_date', 'ASC');
+        }])
+        ->first();
+
+        return view('accounts.installments', compact('account'));
+    }
+
+    public function view($account_id)
+    {
+        $account = $this->account
+        ->find($account_id);
+        $account->tradeInstallments;
+
+        return view('accounts.view', compact('account'));
+    }
+
+    private function getAccountsStatus($accounts)
+    {
+        foreach($accounts as $idx=>$account) {
+            $status = $this->getAccountStatus($account);
+
+            $accounts[$idx]['status_description'] = $status['status_description'];
+            $accounts[$idx]['status'] = $status['status'];
+        }
+
+        return $accounts;
+    }
+
+    private function getAccountStatus($account)
+    {
+        if($account->tradeInstallments()->count()) {
+            $last_payment = $account->tradeInstallments()->orderBy('expiration_date', 'desc')->first();
+
+            $response = [
+                'status_description' => '',
+                'status' => ''
+            ];
+
+            if($last_payment->status) {
+                $response['status_description'] = '<span class="badge rounded-pill bg-success text-light">Pago</span>';
+                $response['status'] = 1;
+            } else {
+                $last_installment_paid = $account->tradeInstallments()->whereStatus(0)->orderBy('expiration_date')->first();
+                $response['status_description'] = "<span class='badge rounded-pill bg-primary text-light'>Aguardando {$last_installment_paid->installment}ª parcela</span>";
+                $response['status'] = 2;
+            }
+        } else if($account->expiration_date < date('Y-m-d')) {
+            $response['status_description'] = '<span class="badge rounded-pill bg-danger text-light">Vencido</span>';
+            $response['status'] = 3;
+        } else {
+            $response['status_description'] = '<span class="badge rounded-pill bg-warning">Aguardando negociação</span>';
+            $response['status'] = 4;
+        }
+
+        return $response;
+    }
+
+    public function doTrade(Request $request, $id)
+    {
+        $installments = $request->installments;
+
+        $account = $this->account->find($id);
+
+        $value = number_format(($account->value / $installments), 2, '.', '');
+
+        $date = \Carbon\Carbon::now();
+
+        foreach(range(1, $installments) as $installment) {
+            \App\Models\AccountInstallment::create([
+                'account_id' => $id,
+                'value' => $value,
+                'installment' => $installment,
+                'expiration_date' => $date->addMonth(),
+                'status' => 0
+            ]);
+        }
+
+        flash('Negociação realizada com sucesso')->success();
+
+        return redirect()->route('accounts.my');
+    }
+
+    public function payInstallment($id)
+    {
+        $installment = \App\Models\AccountInstallment::find($id);
+
+        $account = $this->account->find($installment->account_id);
+
+        $last_installment_paid = $account->tradeInstallments()->whereStatus(0)->orderBy('expiration_date')->first();
+
+        if($last_installment_paid->installment != $installment->installment) {
+            flash("Realize o pagamento da {$last_installment_paid->installment}ª parcela antes de efetuar o pagamento da {$installment->installment}ª parcela.")->error();
+            return redirect()->route('accounts.installments', ['account_id' => $installment->account_id]);
+        }
+
+        $installment->update([
+            'status' => 1
+        ]);
+
+        flash('Parcela paga com sucesso')->success();
+
+        return redirect()->route('accounts.installments', ['account_id' => $installment->account_id]);
     }
 }

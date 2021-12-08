@@ -3,9 +3,9 @@
 @section('content')
 <div class="p-5">
     <div class="text-center">
-        <h1 class="h4 text-gray-900 mb-4">Área do cliente</h1>
+        <h1 class="h4 text-gray-900 mb-4">Primeiro acesso</h1>
     </div>
-    <form method="POST" class="user" action="{{ route('client.handle.login') }}">
+    <form method="POST" action="{{ route('client.firstAccess') }}">
         @csrf
         <div class="form-group">
             <input id="email"
@@ -41,21 +41,29 @@
             @enderror
         </div>
         <div class="form-group">
-            <div class="custom-control custom-checkbox small">
-                <input class="form-check-input custom-control-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                <label class="custom-control-label" for="remember">
-                    Lembrar-me
-                </label>
-            </div>
+            <input
+                id="password_confirmation"
+                type="password"
+                class="form-control form-control-user @error('password_confirmation') is-invalid @enderror"
+                name="password_confirmation"
+                required
+                placeholder="Confirmar senha"
+            >
+
+            @error('password_confirmation')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
         </div>
         <button type="submit" class="btn btn-primary btn-user btn-block">
-            Login
+            Registrar-se
         </button>
-        <hr>
-        <div class="text-center">
-            <a class="small" href="{{route('client.firstAccessView')}}">Primeiro acesso</a>
-        </div>
     </form>
+    <hr>
+    <div class="text-center">
+        <a class="small" href="/">Voltar</a>
+    </div>
 </div>
 
 

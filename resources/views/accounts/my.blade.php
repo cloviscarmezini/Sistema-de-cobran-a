@@ -2,36 +2,37 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="my-3 text-right">
-            <a href="{{route('accounts.create')}}" class="btn btn-primary">Novo título</a>
-        </div>
-
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Cliente</th>
                         <th>Descrição</th>
                         <th>Valor</th>
                         <th>Vencimento</th>
+                        <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($accounts as $account)
                         <tr>
-                            <td>{{$account->client->name}}</td>
-                            <td>{{$account->description}}</td>
-                            <td>R${{number_format($account->value, 2, ',', '.')}}</td>
-                            <td>{{$account->expiration_date->format('d/m/Y')}}</td>
+                            <td>{{ $account->description }}</td>
+                            <td>
+                                @if($account->tradeInstallments->count() == 1)
+                                    R${{number_format(($account->value - ($account->value / 100 * $account->discount)), 2, ',', '.')}}
+                                @else
+                                    R${{ number_format($account->value, 2, ',', '.') }}
+                                @endif
+                            </td>
+                            <td>{{ $account->expiration_date->format('d/m/Y') }}</td>
+                            <td> @php echo $account->status_description @endphp</td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{{route('accounts.edit', ['account' => $account->id])}}" class="btn btn-link"><i class="fas fa-edit"></i></a>
-                                    <form id="delete-account" action="{{route('accounts.destroy', ['account' => $account->id])}}" method="post">
-                                        @csrf
-                                        @method('delete')
-                                        <button class="btn btn-link text-danger" onClick="deleteConfirm('delete-account')" type="button"><i class="fas fa-trash"></i></button>
-                                    </form>
+                                    @if($account->status === 1 || $account->status === 2)
+                                        <a href="{{route('accounts.installments', ['account_id' => $account->id])}}" class="btn btn-primary">Visualizar</a>
+                                    @elseif($account->status === 4)
+                                        <a href="{{route('accounts.trade', ['account_id' => $account->id])}}" class="btn btn-success">Negociar</i></a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

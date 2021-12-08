@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Casts\PriceCast;
 use GoldSpecDigital\LaravelEloquentUUID\Database\Eloquent\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,5 +26,9 @@ class Account extends Model
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function tradeInstallments() {
+        return $this->hasMany(AccountInstallment::class);
     }
 }

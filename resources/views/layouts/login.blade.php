@@ -37,6 +37,11 @@
                                 @yield('content')
                             </div>
                         </div>
+                        <div class="row my-2">
+                            <div class="col-12">
+                                @include('flash::message')
+                            </div>
+                        </div>
                     </div>
                 </div>
 

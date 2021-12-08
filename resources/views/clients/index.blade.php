@@ -29,10 +29,10 @@
                             <td>
                                 <div class="btn-group">
                                     <a href="{{route('clients.edit', ['client' => $client->id])}}" class="btn btn-link"><i class="fas fa-edit"></i></a>
-                                    <form id="delete-client" action="{{route('clients.destroy', ['client' => $client->id])}}" method="post">
+                                    <form id="{{$client->id}}" action="{{route('clients.destroy', ['client' => $client->id])}}" method="post">
                                         @csrf
                                         @method('delete')
-                                        <button class="btn btn-link text-danger" onClick="deleteConfirm('delete-client')" type="button"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-link text-danger" onClick="deleteConfirm('{{$client->id}}')" type="button"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>

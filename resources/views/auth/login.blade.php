@@ -56,6 +56,12 @@
     <div class="text-center">
         <a class="small" href="{{route('register')}}">Registre-se!</a>
     </div>
+    <div class="text-center">
+        -
+    </div>
+    <div class="text-center">
+        <a class="small" href="{{route('client.login')}}">Acessar área do cliente</a>
+    </div>
 </div>
 
 

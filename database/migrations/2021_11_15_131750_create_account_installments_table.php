@@ -18,6 +18,7 @@ class CreateAccountInstallmentsTable extends Migration
             $table->uuid('account_id');
             $table->decimal('value', 10, 2);
             $table->string('installment');
+            $table->date('expiration_date');
             $table->boolean('status');
             $table->timestamps();
 
