@@ -15,17 +15,17 @@ class CreateClientsTable extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
-            $table->string('email');
+            $table->string('name', 50);
+            $table->string('email', 100);
             $table->string('password')->nullable();
-            $table->string('phone');
+            $table->string('phone', 17);
             $table->string('document');
-            $table->string('zip_code');
-            $table->string('address');
-            $table->string('number');
-            $table->string('district');
-            $table->string('state');
-            $table->string('country');
+            $table->string('zip_code', 12);
+            $table->string('address', 100);
+            $table->string('number', 10);
+            $table->string('district', 50);
+            $table->string('state', 3);
+            $table->string('country', 50);
             $table->timestamps();
         });
     }

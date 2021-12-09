@@ -17,12 +17,12 @@ class CreateAccountsTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('client_id');
             $table->uuid('user_id');
-            $table->string('description');
-            $table->string('type');
+            $table->string('description', 150);
+            $table->string('type', 25);
             $table->decimal('value', 10, 2);
-            $table->string('readjustment_type');
-            $table->string('installments');
-            $table->string('discount');
+            $table->string('readjustment_type', 10);
+            $table->integer('installments');
+            $table->integer('discount');
             $table->date('expiration_date');
             $table->timestamps();
 

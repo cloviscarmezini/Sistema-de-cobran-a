@@ -32,7 +32,9 @@
                     <div class="card-body p-0">
                         <!-- Nested Row within Card Body -->
                         <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-primary"></div>
+                            <div class="col-lg-6 d-none d-lg-flex bg-primary justify-content-center align-items-center">
+                                <img src="{{asset('img/logo.png')}}" alt="">
+                            </div>
                             <div class="col-lg-6">
                                 @yield('content')
                             </div>
